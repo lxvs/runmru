@@ -3,7 +3,7 @@
 
 @echo off
 @setlocal enableextensions disabledelayedexpansion
-set "version=0.1.1"
+set "version=0.1.2"
 title RunMRU v%version%
 
 for /f "tokens=3" %%i in ('reg query HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /v MRUList') do set "mrulist=%%i"
@@ -20,7 +20,10 @@ if not defined mruContent (
 )
 if "%mruContent:~-2%"=="\1" set "mruContent=%mruContent:~0,-2%"
 set /p=%mru%) <nul
-@echo %mruContent:&=^&%
+
+set "mruContent=%mruContent:|=^|%"
+set "mruContent=%mruContent:&=^&%"
+@echo %mruContent%
 set /a "pos+=1"
 set "mrulist=%mrulist:~1%"
 goto mruparse
