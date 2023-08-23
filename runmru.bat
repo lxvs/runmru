@@ -12,23 +12,15 @@ set /a "pos=0"
 
 :mruparse
 if "%mrulist%" NEQ "" (set "mru=%mrulist:~0,1%") else goto aftermru
-set "mruContent="
-for /f "tokens=1-2,*" %%i in ('reg query HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /v %mru%') do set "mruContent=%%k"
-if not defined mruContent (
-    set "mrulist=%mrulist:~1%"
-    goto mruparse
-)
-if "%mruContent:~-2%"=="\1" set "mruContent=%mruContent:~0,-2%"
+for /f "tokens=1-2,*" %%i in ('reg query HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /v %mru%') do (>"%TEMP%\mrucontent.tmp" echo %%k)
 set /p=%mru%) <nul
-
-set "mruContent=%mruContent:|=^|%"
-set "mruContent=%mruContent:&=^&%"
-@echo %mruContent%
+type "%TEMP%\mrucontent.tmp"
 set /a "pos+=1"
 set "mrulist=%mrulist:~1%"
 goto mruparse
 
 :aftermru
+del "%TEMP%\mrucontent.tmp"
 set "tags="
 set /p "tags=Please input the items to delete (Input %% to delete all): "
 
