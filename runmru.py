@@ -132,6 +132,7 @@ def main():
     d = get_mru(k, l)
     if al or not (ai or asm or ar):
         list_mru(d)
+        return
     if not f:
         print("use with -f or --force to delete following items:")
     if ai:
