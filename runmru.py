@@ -74,6 +74,7 @@ def delete_by_index(k, i, d, f):
         return
     for x in tbd:
         if f:
+            print(f"[d] delete {x}: {d[x]}")
             winreg.DeleteValue(k, x)
         else:
             print(f"[d] {x}: {d[x]}")
@@ -97,6 +98,7 @@ def delete_by_simple_match(k, p, d, i, f):
         return
     for x in tbd:
         if f:
+            print(f"[s] delete {x}: {d[x]}")
             winreg.DeleteValue(k, x)
         else:
             print(f"[s] {x}: {d[x]}")
@@ -112,6 +114,7 @@ def delete_by_regex(k, r, d, i, f):
         return
     for x in tbd:
         if f:
+            print(f"[r] delete {x}: {d[x]}")
             winreg.DeleteValue(k, x)
         else:
             print(f"[r] {x}: {d[x]}")
@@ -129,6 +132,8 @@ def main():
     d = get_mru(k, l)
     if al or not (ai or asm or ar):
         list_mru(d)
+    if not f:
+        print("use with -f or --force to delete following items:")
     if ai:
         delete_by_index(k, ai, d, f)
     if asm:
