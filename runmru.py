@@ -15,7 +15,7 @@ def parse_args():
         action='store_true',
     )
     p.add_argument(
-        '-i',
+        '-d',
         '--delete-by-index',
     )
     p.add_argument(
@@ -25,6 +25,11 @@ def parse_args():
     p.add_argument(
         '-r',
         '--delete-by-regex',
+    )
+    p.add_argument(
+        '-i',
+        '--ignore-case',
+        action='store_true',
     )
     p.add_argument(
         '-f',
@@ -65,15 +70,19 @@ def delete_by_index(k, i, d, f):
         if f:
             winreg.DeleteValue(k, x)
         else:
-            print(f"[i] {x}: {d[x]}")
+            print(f"[d] {x}: {d[x]}")
 
-def delete_by_simple_match(k, p, d, f):
+def delete_by_simple_match(k, p, d, i, f):
     ps = p.split()
     tbd = ''
     for x in d.keys():
         for p in ps:
-            if p not in d[x]:
-                break
+            if i:
+                if p.lower() not in d[x].lower():
+                    break
+            else:
+                if p not in d[x]:
+                    break
         else:
             if x not in tbd:
                 tbd += x
@@ -86,8 +95,8 @@ def delete_by_simple_match(k, p, d, f):
         else:
             print(f"[s] {x}: {d[x]}")
 
-def delete_by_regex(k, r, d, f):
-    rr = re.compile(r)
+def delete_by_regex(k, r, d, i, f):
+    rr = re.compile(r, re.IGNORECASE if i else re.NOFLAG)
     tbd = ''
     for x in d.keys():
         if rr.search(d[x]) and x not in tbd:
@@ -107,6 +116,7 @@ def main():
     ai = a.delete_by_index
     asm = a.delete_by_simple_match
     ar = a.delete_by_regex
+    i = a.ignore_case
     f = a.force
     k = winreg.OpenKey(winreg.HKEY_CURRENT_USER, 'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\RunMRU', access=winreg.KEY_READ | winreg.KEY_WRITE)
     l = winreg.QueryValueEx(k, 'MRUList')[0]
@@ -116,9 +126,9 @@ def main():
     if ai:
         delete_by_index(k, ai, d, f)
     if asm:
-        delete_by_simple_match(k, asm, d, f)
+        delete_by_simple_match(k, asm, d, i, f)
     if ar:
-        delete_by_regex(k, ar, d, f)
+        delete_by_regex(k, ar, d, i, f)
 
 if __name__ == '__main__':
     main()
