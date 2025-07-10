@@ -37,6 +37,12 @@ def parse_args():
         action='store_true',
         help="dry run if not specified",
     )
+    p.add_argument(
+        '-V',
+        '--version',
+        action='version',
+        version=__version__,
+    )
     return p.parse_args()
 
 def get_mru(k, l):
