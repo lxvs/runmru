@@ -2,6 +2,7 @@
 
 __version__ = '0.2.0'
 
+import re
 import sys
 import winreg
 import argparse
@@ -86,7 +87,19 @@ def delete_by_simple_match(k, p, d, f):
             print(f"[s] {x}: {d[x]}")
 
 def delete_by_regex(k, r, d, f):
-    print("delete_by_regex: not implemented")
+    rr = re.compile(r)
+    tbd = ''
+    for x in d.keys():
+        if rr.search(d[x]) and x not in tbd:
+            tbd += x
+    if not tbd:
+        print("delete_by_regex: no match")
+        return
+    for x in tbd:
+        if f:
+            winreg.DeleteValue(k, x)
+        else:
+            print(f"[r] {x}: {d[x]}")
 
 def main():
     a = parse_args()
