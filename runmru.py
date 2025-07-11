@@ -17,6 +17,7 @@ def parse_args():
     p.add_argument(
         '-d',
         '--delete-by-index',
+        action='append',
     )
     p.add_argument(
         '-s',
@@ -122,7 +123,7 @@ def delete_by_regex(k, r, d, i, f):
 def main():
     a = parse_args()
     al = a.list
-    ai = a.delete_by_index
+    ai = ''.join(a.delete_by_index) if a.delete_by_index else ''
     asm = a.delete_by_simple_match
     ar = a.delete_by_regex
     i = a.ignore_case
