@@ -59,13 +59,13 @@ def list_mru(d):
     for k in d.keys():
         print(f"{k}: {d[k]}")
 
-def delete_by_index(k, i, d, f):
+def delete_by_index(k, i, d, f, dl):
     missing = ''
     tbd = ''
     for x in i:
         if x not in d and x not in missing:
             missing += x
-        if x not in tbd:
+        if x not in tbd and x not in dl:
             tbd += x
     if missing:
         print(f"error: invalid index: {missing}", file=sys.stderr)
@@ -79,8 +79,9 @@ def delete_by_index(k, i, d, f):
             winreg.DeleteValue(k, x)
         else:
             print(f"[d] {x}: {d[x]}")
+    dl += list(tbd)
 
-def delete_by_simple_match(k, p, d, i, f):
+def delete_by_simple_match(k, p, d, i, f, dl):
     ps = p.split()
     tbd = ''
     for x in d.keys():
@@ -92,7 +93,7 @@ def delete_by_simple_match(k, p, d, i, f):
                 if p not in d[x]:
                     break
         else:
-            if x not in tbd:
+            if x not in tbd and x not in dl:
                 tbd += x
     if not tbd:
         print("delete_by_simple_match: no match")
@@ -103,12 +104,13 @@ def delete_by_simple_match(k, p, d, i, f):
             winreg.DeleteValue(k, x)
         else:
             print(f"[s] {x}: {d[x]}")
+    dl += list(tbd)
 
-def delete_by_regex(k, r, d, i, f):
+def delete_by_regex(k, r, d, i, f, dl):
     rr = re.compile(r, re.IGNORECASE if i else re.NOFLAG)
     tbd = ''
     for x in d.keys():
-        if rr.search(d[x]) and x not in tbd:
+        if rr.search(d[x]) and x not in tbd and x not in dl:
             tbd += x
     if not tbd:
         print("delete_by_regex: no match")
@@ -119,6 +121,7 @@ def delete_by_regex(k, r, d, i, f):
             winreg.DeleteValue(k, x)
         else:
             print(f"[r] {x}: {d[x]}")
+    dl += list(tbd)
 
 def main():
     a = parse_args()
@@ -136,12 +139,13 @@ def main():
         return
     if not f:
         print("use with -f or --force to delete following items:")
+    deleted = []
     if ai:
-        delete_by_index(k, ai, d, f)
+        delete_by_index(k, ai, d, f, deleted)
     if asm:
-        delete_by_simple_match(k, asm, d, i, f)
+        delete_by_simple_match(k, asm, d, i, f, deleted)
     if ar:
-        delete_by_regex(k, ar, d, i, f)
+        delete_by_regex(k, ar, d, i, f, deleted)
 
 if __name__ == '__main__':
     main()
